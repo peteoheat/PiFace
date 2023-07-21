@@ -17,11 +17,13 @@ class VideoGet:
         return self
 
     def get(self):
-        while not self.stopped:
-            if not self.grabbed:
-                self.stop()
-            else:
-                (self.grabbed, self.frame) = self.stream.read()
+        while True:
+            if self.stopped:
+                return
+            (self.grabbed, self.frame) = self.stream.read()
+
+    def read(self):
+        return self.frame
 
     def stop(self):
         self.stopped = True

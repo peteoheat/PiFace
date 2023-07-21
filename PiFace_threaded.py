@@ -159,6 +159,5 @@ if __name__ == "__main__":
             video_getter.stop()
             recognise_faces.stop()
             break
-        frame = video_getter.frame
-        frame = recognise_faces.frame
-        video_shower.frame = frame
+        frame = video_getter.read()
+        video_shower.frame = recognise_faces.processframe(frame)
