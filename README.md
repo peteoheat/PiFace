@@ -1,6 +1,9 @@
 # PiFace
 Raspberry Pi facial recognition multi-factor authentication security system
 
+# Introductory Video
+https://youtu.be/reMThsNkrDE
+
 # Hardware used in this project
 1. Raspberry Pi4 4GB https://thepihut.com/products/raspberry-pi-4-model-b?variant=20064052740158
 2. Waveshare relay HAT for Raspberry Pi https://thepihut.com/products/raspberry-pi-relay-board
