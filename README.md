@@ -14,7 +14,12 @@ The project is best explained through a demonstration, and that can be found her
 7. Raspberry Pi Camera lens (the 6mm one) https://thepihut.com/products/raspberry-pi-high-quality-camera-lens
 
 # Software used.
-This first iteration of PiFace uses Dlib, the face-recognition project from Adam Geitgey, OpenCV and Image Utils. 
+This first iteration of PiFace uses Dlib, the face-recognition project from Adam Geitgey, OpenCV and Image Utils. In addition to this, you will need 
+1. An image to display as the desktop background that in my video looks like the bank vault in it's closed state.
+2. A video to be played for the 'Access Denied'
+3. A video to be played for the 'Access Granted'.
+All of the videos in my project were licensed from Pond5 specifically for my project. I therefore, cannot distribute them with the code for the project.
+I licensed 3 different videos and then edited them together to get the desired results.
 
 # Installation
 Setup a fresh SD card with Raspbian bullseye desktop64bit. These instructions do not detail how to do that, I assume you know already.
@@ -29,12 +34,12 @@ sudo apt upgrade -y
 sudo pip install RPi.GPIO
 
 # SB Components RFID HAT
-# For Pinouts look here https://github.com/sbcshop/SB-RFID-HAT
+For Pinouts look here https://github.com/sbcshop/SB-RFID-HAT
 sudo raspi-config and enable SPI and I2C
 sudo pip install smbus2
 sudo apt-get install i2c-tools
 
-# To verify the list of connected device on I2C interface, you can run below commond :
+To verify the list of connected device on I2C interface, you can run below commond :
 sudo i2cdetect -y 1
 
 # Download this project
@@ -44,37 +49,38 @@ git clone https://github.com/peteoheat/PiFace
 # install RFID required libraries and examples
 git clone https://github.com/sbcshop/SB-RFID-HAT.git
 cd SB-RFID-HAT
-# You can test the RFID reader with either of the following
+You can test the RFID reader with either of the following
 Without Oled display, output on terminal/shell
 python rfid.py
 or
 To show detected tag id on Oled as well as on terminal/shell
 python rfid_with_oled.py
-# Now copy the required files from SB-RFID-HAT into the PiFace home directory
+Now copy the required files from SB-RFID-HAT into the PiFace home directory
 mkdir /home/pi/PiFace/includes
-# Copy the RFID OLED display driver into the /home/pi/PiFace/includes directory
+Copy the RFID OLED display driver into the /home/pi/PiFace/includes directory
 cp oled_091.py /home/pi/PiFace/includes
-# Copy the screen fonts for the RFID OLED display into a new /home/Pi/PiFace/Fonts directory
+Copy the screen fonts for the RFID OLED display into a new /home/Pi/PiFace/Fonts directory
 find Fonts -print | cpio -pdumv /home/pi/PiFace
-# The SB-RFID-HAT directory can now be removed unless you want to keep the example files around.
+The SB-RFID-HAT directory can now be removed unless you want to keep the example files around.
 
 # Original PiFace uses dlib, OpenCV, Image Utils and face-recognition. Here's how to install those
 # This section of configuration changes should all be changed back to the original settings once dlib and OpenCV are compiled
 # dlib
-# Follow all of the directions on https://pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
-# Edit /etc/dphys-swapfile
-# Change CONF_SWAPSIZE=100 to CONF_SWAPSIZE=2048
+A good source of instructions is https://pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
+But here are mine:
+Edit /etc/dphys-swapfile
+Change CONF_SWAPSIZE=100 to CONF_SWAPSIZE=2048
 sudo /etc/init.d/dphys-swapfile stop
 sudo /etc/init.d/dphys-swapfile start
-# Confirm swap increase
+Confirm swap increase
 free -m
-# If you have a Raspberry Pi with a low amount of memory, you can help the dlib compile speed by disabling
-# PIXEL desktop from starting on boot, and compile from the command line. To do this sudo raspi-config and then
-# Boot Options => Desktop / CLI => Console Autologinsudo chmod 755
-# Advanced Options => Memory Split and change this from 64MB to 16MB so that less memory is assigned to the GPU on boot
-# Exit rasp-config and reboot.
+If you have a Raspberry Pi with a low amount of memory, you can help the dlib compile speed by disabling
+PIXEL desktop from starting on boot, and compile from the command line. To do this sudo raspi-config and then
+Boot Options => Desktop / CLI => Console Autologinsudo chmod 755
+Advanced Options => Memory Split and change this from 64MB to 16MB so that less memory is assigned to the GPU on boot
+Exit rasp-config and reboot.
 
-# Install dlib pre-requisites
+Install dlib pre-requisites
 sudo apt-get install build-essential cmake
 sudo apt-get install libgtk-3-dev
 sudo apt-get install libboost-all-dev
@@ -84,7 +90,7 @@ sudo pip install scikit-image
 
 # Install dlib with python bindings
 sudo pip install dlib
-# On a Raspberry Pi4 with 4GB of memory and Bullseye 64bit OS, the compile took me 27mins. So go and make a coffee or something
+On a Raspberry Pi4 with 4GB of memory and Bullseye 64bit OS, the compile took me 27mins. So go and make a coffee or something
 
 # Install OpenCV 4.8. 
 This method compiles OpenCV on the pi rather than installing with pip or apt. It means you can ensure you have the
