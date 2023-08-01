@@ -29,11 +29,10 @@ sudo apt update
 sudo apt upgrade -y
 
 # Install HAT dependencies
-
-# Waveshare Relay HAT
+## Waveshare Relay HAT
 sudo pip install RPi.GPIO
 
-# SB Components RFID HAT
+## SB Components RFID HAT
 For Pinouts look here https://github.com/sbcshop/SB-RFID-HAT
 sudo raspi-config and enable SPI and I2C
 sudo pip install smbus2
