@@ -63,8 +63,8 @@ find Fonts -print | cpio -pdumv /home/pi/PiFace
 The SB-RFID-HAT directory can now be removed unless you want to keep the example files around.
 
 # Original PiFace uses dlib, OpenCV, Image Utils and face-recognition. Here's how to install those
-# This section of configuration changes should all be changed back to the original settings once dlib and OpenCV are compiled
-# dlib
+This section of configuration changes should all be changed back to the original settings once dlib and OpenCV are compiled
+## dlib
 A good source of instructions is https://pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
 But here are mine:
 Edit /etc/dphys-swapfile
@@ -79,7 +79,7 @@ Boot Options => Desktop / CLI => Console Autologinsudo chmod 755
 Advanced Options => Memory Split and change this from 64MB to 16MB so that less memory is assigned to the GPU on boot
 Exit rasp-config and reboot.
 
-Install dlib pre-requisites
+## Install dlib pre-requisites
 sudo apt-get install build-essential cmake
 sudo apt-get install libgtk-3-dev
 sudo apt-get install libboost-all-dev
@@ -87,11 +87,11 @@ sudo pip install numpy
 sudo pip install scipy
 sudo pip install scikit-image
 
-# Install dlib with python bindings
+## Install dlib with python bindings
 sudo pip install dlib
 On a Raspberry Pi4 with 4GB of memory and Bullseye 64bit OS, the compile took me 27mins. So go and make a coffee or something
 
-# Install OpenCV 4.8. 
+## Install OpenCV 4.8. 
 This method compiles OpenCV on the pi rather than installing with pip or apt. It means you can ensure you have the
 latest version and the most flexible install but be aware that it is by far the slowest. I didn't time exactly, but I think it took about an hour and 10 mins.
 I used this method because I wanted version 4.8.0 which has integration with Tensorflow lite models that wasn't available using pip or apt.
@@ -104,18 +104,18 @@ wget https://github.com/Qengineering/Install-OpenCV-Raspberry-Pi-64-bits/raw/mai
 sudo chmod 755 ./OpenCV-4-8-0.sh
 ./OpenCV-4-8-0.sh
 
-# Test the OpenCV installation
+## Test the OpenCV installation
 python
 >>> import cv2
 >>> print( cv2.getBuildInformation() )
 
 That should display a detailed page about your OpenCV installation
 
-# Now we can backout the change we made to /etc/dphys-swapfile
+## Now we can backout the change we made to /etc/dphys-swapfile
 vi /etc/dphys-swapfile and change the line CONF_SWAPSIZE=2048 back to CONF_SWAPSIZE=100
 sudo /etc/init.d/dphys-swapfile stop
 sudo /etc/init.d/dphys-swapfile start
-# Confirm swap decrease with
+## Confirm swap decrease with
 free -m
 
 # Install Image Utils and face-recognition
