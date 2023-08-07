@@ -37,6 +37,8 @@ frame_height=720
 frame_colour_format="RGB888"
 frame_rate=30
 small_frame_scale=0.25
+
+# If using a raspberry pi camera on the CSI interface
 camera=Picamera2()
 camera.preview_configuration.main.size=(frame_width,frame_height)
 camera.preview_configuration.main.format=frame_colour_format
@@ -44,6 +46,14 @@ camera.preview_configuration.controls.FrameRate=frame_rate
 camera.preview_configuration.align()
 camera.configure("preview")
 camera.start()
+
+#If using a webcam on a USB port. Your camera might be on something other than
+#/dev/video0 you can check by running the command 'v4l2-ctl --list-devices
+#webCam='/dev/video0'
+#camera=cv2.VideoCapture(webcam)
+#camera.set(cv2.CAP_PROP_FRAME_WIDTH=frame_width)
+#camera.set(cv2.CAP_PROP_FRAME_HEIGHT=frame_height)
+#camera.set(cv2.CAP_PROP_FRAME_FPS=frame_rate)
 
 
 # GPIO PINS
@@ -105,9 +115,9 @@ def read_rfid():
     ser.baudrate = 9600  # Set baud rate to 9600
     data = ser.read(12)  # Read 12 characters from serial port to data
     if (data != " "):
-        GPIO.output(Buzzer, GPIO.HIGH)
+        #GPIO.output(Buzzer, GPIO.HIGH)
         sleep(.2)
-        GPIO.output(Buzzer, GPIO.LOW)
+        #GPIO.output(Buzzer, GPIO.LOW)
         ser.close()  # Close port
         data = data.decode("utf-8")
         return data
@@ -151,7 +161,7 @@ def clean_exit():
 
 # This function is called when access is granted. It plays a movie of the bank vault opening and updates the OLED display
 def grant_access():
-    access_image = "ffplay -loglevel quiet -hide_banner -noborder -nostats -autoexit Images/granted.avi"
+    access_image = "ffplay -loglevel quiet -hide_banner -noborder -nostats -autoexit Images/granted.mp4"
     oled.PrintText("Access granted!", FontSize=14)
     pixels.fill(pixel_green)
     pixels.show()
@@ -243,20 +253,18 @@ def factor_3(this_card_pin):
                 right *= int(1/small_frame_scale)
                 bottom *= int(1/small_frame_scale)
                 left *= int(1/small_frame_scale)
-                print (top, right, bottom, left)
                 # draw the predicted face name on the image - color is in BGR
                 cv2.rectangle(frame, (left, top), (right, bottom), drawcolour, 2)
                 y = top - 15 if top - 15 > 15 else top + 15
                 cv2.putText(frame, textname, (left, y), cv2.FONT_HERSHEY_SIMPLEX, .8, drawcolour, 2)
-                cv2.putText(frame, str(int(fps))+'fps',fps_pos,fps_font,fps_height,fps_colour,fps_weight)
 
         # display the image to our screen
         winname = "Facial Recognition in progress"
         cv2.namedWindow(winname)
         cv2.moveWindow(winname, 40,30)
+        cv2.putText(frame, str(int(fps))+'fps',fps_pos,fps_font,fps_height,fps_colour,fps_weight)
         cv2.imshow(winname, frame)
-        #key = cv2.waitKey(1) & 0xFF
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(1) & 0xFF
 
         # quit when 'q' key is pressed
         #if key == ord("q"):
@@ -310,4 +318,5 @@ if __name__ == "__main__":
             oled.NoDisplay()
             oled.PrintText("Scan your card", FontSize=14)
             oled.ShowImage()
-vs.stop()
+camera.stop()
+cv2.destroyAllWindows()

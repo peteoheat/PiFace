@@ -14,19 +14,26 @@ The project is best explained through a demonstration, and that can be found her
 7. Raspberry Pi Camera lens (the 6mm one) https://thepihut.com/products/raspberry-pi-high-quality-camera-lens
 
 # Software used.
-This first iteration of PiFace uses Dlib, the face-recognition project from Adam Geitgey, OpenCV and Image Utils. In addition to this, you will need 
+This  iteration of PiFace uses Dlib, the face-recognition project from Adam Geitgey and OpenCV In addition to this, you will need 
 1. An image to display as the desktop background that in my video looks like the bank vault in it's closed state.
 2. A video to be played for the 'Access Denied'
 3. A video to be played for the 'Access Granted'.
 All of the videos in my project were licensed from Pond5 specifically for my project. I therefore, cannot distribute them with the code for the project.
-I licensed 3 different videos and then edited them together to get the desired results.
+I licensed 3 different videos and then edited them together to get the desired results. I also had to add the siren sound to the 'access denied' video using a video editor.
 
 # Installation
-Setup a fresh SD card with Raspbian bullseye desktop64bit. These instructions do not detail how to do that, I assume you know already.
+Setup a fresh SD card with Raspbian bullseye desktop 64bit. These instructions do not detail how to do that, I assume you know already.
 
 # Update the raspberry pi
 sudo apt update
 sudo apt upgrade -y
+
+#Enable I2C and SPI
+sudo raspi-config
+'Interface Options'-> 'SPI' -> 'Yes'
+'Interface Options' -> I2C -> 'Yes'
+exit
+reboot
 
 # Install HAT dependencies
 ## Waveshare Relay HAT
@@ -58,24 +65,26 @@ Now copy the required files from SB-RFID-HAT into the PiFace home directory
 mkdir /home/pi/PiFace/includes
 Copy the RFID OLED display driver into the /home/pi/PiFace/includes directory
 cp oled_091.py /home/pi/PiFace/includes
+cp oled_091.py /home/pi/PiFace/
 Copy the screen fonts for the RFID OLED display into a new /home/Pi/PiFace/Fonts directory
 find Fonts -print | cpio -pdumv /home/pi/PiFace
 The SB-RFID-HAT directory can now be removed unless you want to keep the example files around.
 
-# Original PiFace uses dlib, OpenCV, Image Utils and face-recognition. Here's how to install those
+#PiFace uses dlib, OpenCV, Image Utils and face-recognition. Here's how to install those
 This section of configuration changes should all be changed back to the original settings once dlib and OpenCV are compiled
 ## dlib
 A good source of instructions is https://pyimagesearch.com/2017/05/01/install-dlib-raspberry-pi/
 But here are mine:
+# We need to increase the swap size just whilst we get things compiled.
 Edit /etc/dphys-swapfile
 Change CONF_SWAPSIZE=100 to CONF_SWAPSIZE=2048
 sudo /etc/init.d/dphys-swapfile stop
 sudo /etc/init.d/dphys-swapfile start
 Confirm swap increase
 free -m
-If you have a Raspberry Pi with a low amount of memory, you can help the dlib compile speed by disabling
-PIXEL desktop from starting on boot, and compile from the command line. To do this sudo raspi-config and then
-Boot Options => Desktop / CLI => Console Autologinsudo chmod 755
+If you have a Raspberry Pi with a low amount of memory (1GB or 2GB), you can help the dlib compile speed by disabling
+PIXEL desktop from starting on boot, and compile from the command line. I have not found this necessary on the 4GB. To do this sudo raspi-config and then
+Boot Options => Desktop / CLI => Console Autologin
 Advanced Options => Memory Split and change this from 64MB to 16MB so that less memory is assigned to the GPU on boot
 Exit rasp-config and reboot.
 
@@ -100,6 +109,7 @@ PiFace version 1 doesn't use Tensorflow, but I want to have a play with it for p
 Before doing the install, if not done previously we need to increase the SWAP so that we have at least 6GB of available total memory.
 On a 4GB raspberry Pi, we increase SWAP to 2048. You can adjust based on how much physical memory your Pi has.
 Also need to change the GPU settings as we did previously, but this time revise it up to at least 128MB and reboot.
+
 wget https://github.com/Qengineering/Install-OpenCV-Raspberry-Pi-64-bits/raw/main/OpenCV-4-8-0.sh
 sudo chmod 755 ./OpenCV-4-8-0.sh
 ./OpenCV-4-8-0.sh
@@ -118,5 +128,33 @@ sudo /etc/init.d/dphys-swapfile start
 ## Confirm swap decrease with
 free -m
 
-# Install Image Utils and face-recognition
-sudo pip install imutils face-recognition
+## Re-enable the desktop and increase the memory allocated to the GPU. I made the memory more than the default to try to improve frames per second for image processing
+sudo raspi-config
+Boot Options => Desktop / CLI => Console Autologin 
+Advanced Options => Memory Split and change this from 16MB to 256MB.
+
+# Final setup
+##Raspberry desktop
+So the static screen of the closed bank vault is a bit of a trick. All you are really looking at is the desktop background at this stage. To achieve this I did the following
+* Capture a single image from the bank vault video you purchased, then set this as your desktop background.
+* Set the taskbar to auto-hide
+* Remove the wastebacket icon from the desktop.
+You should now have a complete clear desktop showing an image of the bankvault.
+
+##Setting up PiFace
+###Add 'authorised' bank staff.
+
+####Capture images for each card/person pair
+There are a few steps to this process.
+1. Capture images of the authorised person that are associated to their individual access card. We do this using the add_user.py python script. Run it in a terminal window and it will ask you to scan a card.
+Scan an unused access card and it will then launch a camera capture window. Have the individual look at the camera and press <SPACE> to capture their image. 
+Then repeat this with their face in slightly different orientations somewhere between 30-50 times to make a decent set of training data. Then press <esc> to complete the process for this person.
+2. Repeat step (1) with as many authorised people as you need. But remember, the more people you have the slower the recognition will be.
+The images will all be stored under PiFace/data/<card number>
+
+####Train the facial recognition model to recognise the authorised faces.
+1. Run train_model.py and wait. This process can take a while based on how many images there are. This could be enhanced in the future by making it multi-threaded and by making it only adding any changes rather than processing every image.
+train_the model proccesses all of the files under PiFace/dataset/<card number>. It finds faces within the images and creates an encoding of them using the HOG model. All of the encodings are then added to the file encodings.pickle.
+
+You should now be ready to run PiFace.py
+
