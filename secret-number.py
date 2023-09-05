@@ -1,8 +1,9 @@
 import random
 import tkinter as tk
 from tkinter import messagebox
+import sys
 
-num_digits = 3
+num_digits = 4
 num_guesses = 5
 
 # variables
@@ -21,7 +22,7 @@ class NumberWordleGame:
         self.attempts = 0
         self.guesses = []
 
-        self.label = tk.Label(root, text="Enter 3 digit access code:", font=("Helvetica", 16), bg="white")
+        self.label = tk.Label(root, text=f"Enter {self.num_digits} digit access code:", font=("Helvetica", 16), bg="white")
         self.label.pack(pady=10)
 
         self.entry = tk.Entry(root, font=("Helvetica", 14))
@@ -71,15 +72,16 @@ class NumberWordleGame:
         self.update_guess_display()
 
         if user_guess == self.secret_number:
-            messagebox.showinfo("Congratulations", f"You've guessed the correct number {user_guess}!\nIt took you {self.attempts + 1} attempts.")
+            messagebox.showinfo("Succes", f"You have entered the correct number {user_guess}!\nIt took you {self.attempts + 1} attempts.")
             self.root.destroy()
+            sys.exit(1)
         else:
             self.attempts += 1
             self.entry.delete(0, tk.END)
         if self.attempts == num_guesses:
-            messagebox.showinfo("Failed!", f"You have reached the maximum of {num_guesses} attempts. Try again.")
+            messagebox.showinfo("Failed!", f"You have reached the maximum of {num_guesses} attempts.")
             self.root.destroy()
-            
+            sys.exit(0)
 
     def update_guess_display(self):
         for guess, feedback in self.guesses:
@@ -96,4 +98,3 @@ if __name__ == "__main__":
     root.configure(bg='white')
     game = NumberWordleGame(root, num_digits)
     root.mainloop()
-   
