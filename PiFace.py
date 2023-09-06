@@ -15,6 +15,7 @@ from threading import Thread, Event
 import cv2
 from picamera2 import Picamera2
 import numpy as np
+import subprocess
 
 # This dictionary is used to differentiate one, two and three factor cards. For any spare cards I added them to the dictionary with a factor of 99 just to be a record of them
 card_factor = {'0D004B5BBAA7': 1, '3900E1BC3753': 1, '3900E24C33A4': 1, '3900DC2807CA': 2, '3900E5EB4770': 2, '3900DC751888': 2, '3900E5E7172C': 3, '3900DC75FB6B': 3, '3900E1BF3453': 3, '3900DC7760F2': 3, '3900DC783AA7': 2, '3900E6685EE9': 1, '3900E4C66C77': 3, '3900E4BAFA9D': 2, '3900E6757FD5': 1, '3900E4BDD2B2': 3, '3900E67049E6': 2, '3900E666873E': 1, '3900E6765FF6': 3, '3900E67817B0': 2, '3900E665A51F': 1, '1D003D3BDDC6': 1, '1D003D1E7C42': 2, '1D0023A7E970': 3, '1D0023ABEC79': 1, '1D0023AD5AC9': 2, '1D0023867DC5': 3, '1D002388A91F': 1, '1D0023884CFA': 2, '1D0026246D72': 3, '1D00237EADED': 1, '1D002D679EC9': 2, '1D002F5A9DF5': 3}
@@ -192,13 +193,20 @@ def factor_1(this_card_pin):
 
 # This function is called for the second authentication factor "something you know". If the card is recognised, you are asked to enter a PIN which is matched to the card.
 # If you get the correct PIN then access is granted
+#def factor_2(this_card_pin):
+#    entered_code = input('[INFO] Enter 4 digit access code: ')
+#    if entered_code == this_card_pin:
+#        print("[INFO] access code accepted......Factor 2 PASSED!")
+#        return True
+#    else:
+#       print("[INFO] access code incorrect......Factor 2 FAILED!")
+#        return False
 def factor_2(this_card_pin):
-    entered_code = input('[INFO] Enter 4 digit access code: ')
-    if entered_code == this_card_pin:
+    exit_code = subprocess.call(['python','./secret-number.py'])
+    if exit_code == 1:
         print("[INFO] access code accepted......Factor 2 PASSED!")
         return True
     else:
-        print("[INFO] access code incorrect......Factor 2 FAILED!")
         return False
 
 # This function is called for the third authentication factor "something you are". A frame is grabbed from the camera and compared to the known faces from encodings.pickle.
