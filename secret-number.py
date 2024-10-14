@@ -6,6 +6,7 @@ import sys
 num_digits = 4
 num_guesses = 5
 
+
 # variables
 green = '#27e512'
 yellow = '#e8ef0e'
@@ -14,11 +15,13 @@ font = 'Verdana, 38'
 numbers = []
 
 class NumberWordleGame:
-    def __init__(self, root, num_digits):
+    def __init__(self, root, num_digits, secret_number):
         self.root = root
         self.root.title("Factor 2")
         self.num_digits = num_digits
-        self.secret_number = self.generate_random_number(self.num_digits)
+        self.secret_number = secret_number
+        #self.secret_number = self.generate_random_number(self.num_digits)
+        
         self.attempts = 0
         self.guesses = []
 
@@ -94,7 +97,9 @@ class NumberWordleGame:
             
                 
 if __name__ == "__main__":
+    secret_number = sys.argv[2]
+    print("Secret Number is: " + secret_number)
     root = tk.Tk()
     root.configure(bg='white')
-    game = NumberWordleGame(root, num_digits)
+    game = NumberWordleGame(root, num_digits, secret_number)
     root.mainloop()
