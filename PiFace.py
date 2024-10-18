@@ -93,9 +93,17 @@ GPIO.output(Beacon, GPIO.HIGH)
 
 # load the known faces and embeddings along with OpenCV's Haar
 # cascade for face detection
-encodings_file = "encodings.pickle"
+encodings_file = "/mnt/nfsshare/encodings.pickle"
 print("[INFO] loading encodings + face detector...")
-data = pickle.loads(open(encodings_file, "rb").read())
+try:
+    f = open(encodings_file, "rb")
+    data = pickle.load(f)
+    knownCards=data['cards']
+    knownNames=data['names']
+    knownEncodings=data['encodings']
+    f.close()
+except IOError:
+print("[INFO] loading encodings + face detector...")
 
 # load the known faces and embeddings. This file is created using the add_user.py script
 #encodings_file = "encodings.pickle"
@@ -116,9 +124,9 @@ def read_rfid():
     ser.baudrate = 9600  # Set baud rate to 9600
     data = ser.read(12)  # Read 12 characters from serial port to data
     if (data != " "):
-        #GPIO.output(Buzzer, GPIO.HIGH)
+        GPIO.output(Buzzer, GPIO.HIGH)
         sleep(.2)
-        #GPIO.output(Buzzer, GPIO.LOW)
+        GPIO.output(Buzzer, GPIO.LOW)
         ser.close()  # Close port
         data = data.decode("utf-8")
         return data
